@@ -131,6 +131,10 @@ def main():
 
     # Create main window
     main_window = MainWindow(bot_engine, license_validator)
+
+    # Подключаем сигналы логгера к интерфейсу
+    logger.signals.new_log.connect(main_window.append_log)
+
     main_window.show()
 
     # Run application event loop

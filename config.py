@@ -34,14 +34,14 @@ class Config:
             "battle_timeout": 120,
             "max_refresh_attempts": 3,
             "check_interval": 3,
-            "debug_mode": True,  # Включен режим отладки
+            "debug_mode": False,  # Выключен режим отладки
         },
         "license": {
             "directory": os.path.join(os.path.expanduser("~"), ".AOM_Bot"),
         },
         "ui": {
             "theme": "dark",
-            "log_level": "DEBUG",  # Изменен уровень логирования на DEBUG
+            "log_level": "INFO",  # Изменен уровень логирования на INFO
         }
     }
 

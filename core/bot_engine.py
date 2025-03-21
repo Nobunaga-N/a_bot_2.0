@@ -109,7 +109,6 @@ class BotEngine:
                 handler = self.state_actions.get(self.state)
                 if handler:
                     # State handlers return the next state
-                    self.logger.info(f"Обработка состояния: {self.state}")
                     next_state = handler()
                     if next_state and next_state != self.state:
                         self.logger.info(f"Переход состояния: {self.state} -> {next_state}")
