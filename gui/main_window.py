@@ -64,8 +64,7 @@ class MainWindow(QMainWindow):
         self.bot_engine = bot_engine
         self.license_validator = license_validator
 
-        # Получаем ссылку на логгер, но не перезаписываем self.logger
-        # Вместо этого используем другое имя, чтобы избежать конфликтов
+        # Получаем ссылку на логгер
         self._py_logger = logging.getLogger("BotLogger")
 
         # Create and connect signals
@@ -85,6 +84,14 @@ class MainWindow(QMainWindow):
         self.stats_timer = QTimer(self)
         self.stats_timer.timeout.connect(self.update_runtime)
         self.stats_timer.start(1000)  # Update every second
+
+        # НОВЫЙ КОД: Таймер для обновления статистики
+        self.stats_update_timer = QTimer(self)
+        self.stats_update_timer.timeout.connect(self.auto_update_statistics)
+        self.stats_update_timer.start(5000)  # Обновление каждые 5 секунд
+
+        # Переменная для отслеживания изменений в статистике
+        self.last_stats_hash = ""
 
         # Bot runtime
         self.start_time = None
@@ -254,6 +261,9 @@ class MainWindow(QMainWindow):
         from PyQt6.QtWidgets import QComboBox, QTabWidget, QScrollArea
         from PyQt6.QtCore import QSize, Qt
         from PyQt6.QtGui import QFont, QColor
+
+        # НОВЫЙ КОД: сохраняем ссылку на tabWidget, чтобы отслеживать активную вкладку
+        self.tabWidget = tab.parentWidget()
 
         layout = UIFactory.create_vertical_layout()
 
@@ -1141,6 +1151,28 @@ class MainWindow(QMainWindow):
 
         # Update status bar
         self.update_license_status()
+
+    def auto_update_statistics(self):
+        """Автоматически обновляет статистику если данные изменились"""
+        # Проверяем, доступен ли stats_manager
+        if not hasattr(self.bot_engine, 'stats_manager') or self.bot_engine.stats_manager is None:
+            return
+
+        # Проверяем, запущен ли бот
+        if not self.bot_engine.running.is_set():
+            return
+
+        # Проверяем, изменилась ли статистика
+        current_stats = self.bot_engine.stats
+        current_hash = hash(frozenset(current_stats.items()))
+
+        if str(current_hash) != self.last_stats_hash:
+            self.last_stats_hash = str(current_hash)
+
+            # Обновляем статистику только если мы на вкладке статистики
+            if self.tabWidget.currentIndex() == 1:  # Индекс 1 соответствует вкладке статистики
+                self.refresh_statistics()
+                self._py_logger.debug("Автоматическое обновление статистики выполнено")
 
     def update_license_status(self):
         """Update the license status in the status bar."""

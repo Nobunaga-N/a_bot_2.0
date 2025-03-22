@@ -312,7 +312,7 @@ class BotEngine:
             self.adb.tap(*self.click_coords["exit_after_win"])
             time.sleep(5)
 
-            # Update stats manager if available
+            # Обновление статистики в реальном времени
             if self.stats_manager:
                 self.stats_manager.update_stats(self.stats)
 
@@ -321,6 +321,11 @@ class BotEngine:
         elif self.image_matcher.find_in_screen(screen_data, "defeat.png"):
             self.logger.info("❌ Поражение! Обновляем список соперников и пробуем снова.")
             self.stats["defeats"] += 1
+
+            # НОВЫЙ КОД: Эмитируем сигнал обновления статистики
+            if self.signals:
+                self.signals.stats_updated.emit(self.stats)
+
             self.adb.tap(*self.click_coords["exit_after_win"])
             time.sleep(10)
 
@@ -331,14 +336,13 @@ class BotEngine:
             self.adb.tap(*self.click_coords["refresh_opponents"])
             time.sleep(2)
 
-            # Update stats manager if available
+            # Обновление статистики в реальном времени
             if self.stats_manager:
                 self.stats_manager.update_stats(self.stats)
 
             return BotState.STARTING
 
-        # If we can't find victory or defeat screens
-        # Update stats manager if available
+        # Обновление статистики в любом случае
         if self.stats_manager:
             self.stats_manager.update_stats(self.stats)
 

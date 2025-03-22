@@ -150,19 +150,25 @@ class StatsManager:
         Args:
             stats: Dictionary with updated statistics
         """
+        # Проверяем, изменилась ли статистика
+        stats_changed = False
         for key, value in stats.items():
-            if key in self.current_stats:
+            if key in self.current_stats and self.current_stats[key] != value:
                 self.current_stats[key] = value
+                stats_changed = True
 
-        # Save stats after update, but do it less frequently to avoid performance issues
-        # We'll use a simple counter to save only every 5 updates
-        if not hasattr(self, '_update_counter'):
-            self._update_counter = 0
+        # Если статистика изменилась, сохраняем её, но не слишком часто
+        if stats_changed:
+            # Используем счетчик для сохранения только каждые N обновлений
+            # чтобы избежать частых операций записи на диск
+            if not hasattr(self, '_update_counter'):
+                self._update_counter = 0
 
-        self._update_counter += 1
-        if self._update_counter >= 5:
-            self.save_stats()
-            self._update_counter = 0
+            self._update_counter += 1
+            if self._update_counter >= 5:  # Сохраняем каждые 5 изменений
+                self.save_stats()
+                self._update_counter = 0
+                self.logger.debug("Автоматическое сохранение статистики выполнено")
 
     def reset_current_session(self) -> None:
         """Reset the current session statistics."""
