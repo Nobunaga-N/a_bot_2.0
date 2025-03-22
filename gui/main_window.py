@@ -65,8 +65,9 @@ class MainWindow(QMainWindow):
         self.bot_engine = bot_engine
         self.license_validator = license_validator
 
-        # Получаем ссылку на логгер из bot_engine
-        self.logger = logging.getLogger("BotLogger")
+        # Получаем ссылку на логгер, но не перезаписываем self.logger
+        # Вместо этого используем другое имя, чтобы избежать конфликтов
+        self._py_logger = logging.getLogger("BotLogger")
 
         # Create and connect signals
         self.signals = BotSignals()
@@ -657,13 +658,11 @@ class MainWindow(QMainWindow):
             self.update_sessions_table()
 
         except Exception as e:
-            if hasattr(self, 'logger'):
-                self.logger.error(f"Ошибка при обновлении статистики: {e}")
+            self._py_logger.error(f"Ошибка при обновлении статистики: {e}")
             print(f"Ошибка при обновлении статистики: {e}")
             import traceback
             traceback_str = traceback.format_exc()
-            if hasattr(self, 'logger'):
-                self.logger.error(traceback_str)
+            self._py_logger.error(traceback_str)
             print(traceback_str)
 
     def update_trend_charts(self):
@@ -700,10 +699,10 @@ class MainWindow(QMainWindow):
             self.keys_trend_placeholder.setText(keys_text)
 
 
+
         except Exception as e:
 
-            if hasattr(self, 'logger'):
-                self.logger.error(f"Ошибка при обновлении графиков: {e}")
+            self._py_logger.error(f"Ошибка при обновлении графиков: {e}")
 
             print(f"Ошибка при обновлении графиков: {e}")
 
@@ -748,10 +747,10 @@ class MainWindow(QMainWindow):
                 self.daily_stats_table.setItem(row, 7, QTableWidgetItem(str(day["stats"]["connection_losses"])))
 
 
+
         except Exception as e:
 
-            if hasattr(self, 'logger'):
-                self.logger.error(f"Ошибка при обновлении таблицы ежедневной статистики: {e}")
+            self._py_logger.error(f"Ошибка при обновлении таблицы ежедневной статистики: {e}")
 
             print(f"Ошибка при обновлении таблицы ежедневной статистики: {e}")
 
@@ -811,13 +810,11 @@ class MainWindow(QMainWindow):
                     self.sessions_table.setItem(row, 8, QTableWidgetItem(f"{keys_per_victory:.1f}"))
 
                 except Exception as e:
-                    if hasattr(self, 'logger'):
-                        self.logger.error(f"Ошибка при обработке сессии для таблицы: {e}")
+                    self._py_logger.error(f"Ошибка при обработке сессии для таблицы: {e}")
                     print(f"Ошибка при обработке сессии для таблицы: {e}")
 
         except Exception as e:
-            if hasattr(self, 'logger'):
-                self.logger.error(f"Ошибка при обновлении таблицы истории сессий: {e}")
+            self._py_logger.error(f"Ошибка при обновлении таблицы истории сессий: {e}")
             print(f"Ошибка при обновлении таблицы истории сессий: {e}")
 
     def save_settings(self):
