@@ -61,7 +61,8 @@ class BotEngine:
             "victories": 0,
             "defeats": 0,
             "connection_losses": 0,
-            "errors": 0
+            "errors": 0,
+            "keys_collected": 0  # New statistic for tracking keys
         }
 
         # Signals for communicating with the UI (will be set in the main application)
@@ -285,8 +286,20 @@ class BotEngine:
             return BotState.ERROR
 
         if self.image_matcher.find_in_screen(screen_data, "victory.png"):
-            self.logger.info("🏆 Победа! Переходим к следующему бою.")
+            self.logger.info("🏆 Победа! Анализ полученных наград...")
             self.stats["victories"] += 1
+
+            # Detect and count keys before clicking to exit
+            keys_count = self.image_matcher.detect_keys(screen_data)
+            if keys_count > 0:
+                self.stats["keys_collected"] += keys_count
+                self.logger.info(f"🔑 Получено {keys_count} ключей. Всего собрано: {self.stats['keys_collected']}")
+
+                # If signals is set, emit stats_updated to refresh UI
+                if self.signals:
+                    self.signals.stats_updated.emit(self.stats)
+
+            # Continue with normal flow - exit after win
             self.adb.tap(*self.click_coords["exit_after_win"])
             time.sleep(5)
             return BotState.STARTING

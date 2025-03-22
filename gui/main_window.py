@@ -163,6 +163,13 @@ class MainWindow(QMainWindow):
         self.defeats_label = UIFactory.create_label("0")
         stats_layout.addWidget(self.defeats_label, 3, 1)
 
+        # Add Keys Collected (new statistic)
+        stats_layout.addWidget(UIFactory.create_label("Ключей получено:"), 4, 0)
+        self.keys_label = UIFactory.create_label("0")
+        # Set custom style to make it stand out
+        self.keys_label.setStyleSheet(f"color: {Styles.COLORS['primary']}; font-weight: bold;")
+        stats_layout.addWidget(self.keys_label, 4, 1)
+
         # Connection losses
         stats_layout.addWidget(UIFactory.create_label("Потери соединения:"), 0, 2)
         self.conn_losses_label = UIFactory.create_label("0")
@@ -177,6 +184,11 @@ class MainWindow(QMainWindow):
         stats_layout.addWidget(UIFactory.create_label("Успешность:"), 2, 2)
         self.success_rate_label = UIFactory.create_label("0%")
         stats_layout.addWidget(self.success_rate_label, 2, 3)
+
+        # Keys per battle (new statistic)
+        stats_layout.addWidget(UIFactory.create_label("Ключей за бой:"), 3, 2)
+        self.keys_per_battle_label = UIFactory.create_label("0")
+        stats_layout.addWidget(self.keys_per_battle_label, 3, 3)
 
         # Add stats to layout
         stats_group = UIFactory.create_group_box("Статистика")
@@ -432,13 +444,26 @@ class MainWindow(QMainWindow):
         self.conn_losses_label.setText(str(stats.get("connection_losses", 0)))
         self.errors_label.setText(str(stats.get("errors", 0)))
 
+        # Update keys collected
+        keys_collected = stats.get("keys_collected", 0)
+        self.keys_label.setText(str(keys_collected))
+
         # Calculate success rate
         battles = stats.get("victories", 0) + stats.get("defeats", 0)
         if battles > 0:
             success_rate = (stats.get("victories", 0) / battles) * 100
             self.success_rate_label.setText(f"{success_rate:.1f}%")
+
+            # Calculate keys per battle
+            victories = stats.get("victories", 0)
+            if victories > 0:
+                keys_per_battle = keys_collected / victories
+                self.keys_per_battle_label.setText(f"{keys_per_battle:.1f}")
+            else:
+                self.keys_per_battle_label.setText("0")
         else:
             self.success_rate_label.setText("0%")
+            self.keys_per_battle_label.setText("0")
 
     def update_runtime(self):
         """Update the runtime display."""
