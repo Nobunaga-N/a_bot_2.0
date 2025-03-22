@@ -135,6 +135,9 @@ class MainWindow(QMainWindow):
         license_tab = QWidget()
         tab_widget.addTab(license_tab, "Лицензия")
 
+        # Connect tab change signal
+        tab_widget.currentChanged.connect(self.on_tab_changed)
+
         # Add tabs to main layout
         main_layout.addWidget(tab_widget)
 
@@ -276,10 +279,7 @@ class MainWindow(QMainWindow):
         self.stats_period_combo.currentIndexChanged.connect(self.update_stats_period)
         period_layout.addWidget(self.stats_period_combo)
 
-        # Refresh button
-        self.refresh_stats_button = UIFactory.create_primary_button("Обновить")
-        self.refresh_stats_button.clicked.connect(self.refresh_statistics)
-        period_layout.addWidget(self.refresh_stats_button)
+        # Кнопка обновления статистики удалена
 
         period_layout.addStretch()
         layout.addLayout(period_layout)
@@ -498,6 +498,30 @@ class MainWindow(QMainWindow):
 
         # Set layout for the tab
         tab.setLayout(layout)
+
+    def on_tab_changed(self, index):
+        """Обработка события смены вкладки."""
+        # Проверяем, доступен ли stats_manager
+        if not hasattr(self.bot_engine, 'stats_manager') or self.bot_engine.stats_manager is None:
+            return
+
+        if index == 1:  # Вкладка статистики
+            # Немедленно обновляем статистику при переходе на вкладку
+            self._py_logger.info("Переход на вкладку статистики, обновляем данные")
+            self.refresh_statistics()
+
+            # Устанавливаем более частый интервал обновления
+            self.stats_update_timer.stop()
+            self.stats_update_timer.setInterval(1000)  # Обновление каждую секунду
+            self.stats_update_timer.start()
+
+            # Сбрасываем хеш статистики для гарантированного обновления
+            self.last_stats_hash = ""
+        else:
+            # Возвращаем стандартный интервал обновления для других вкладок
+            self.stats_update_timer.stop()
+            self.stats_update_timer.setInterval(5000)  # Обновление каждые 5 секунд
+            self.stats_update_timer.start()
 
     def setup_details_tab(self, tab):
         """Setup the detailed statistics tab with daily breakdowns."""
@@ -988,6 +1012,13 @@ class MainWindow(QMainWindow):
             self.start_time = None
             self.statusBar().showMessage("Бот остановлен")
 
+            # Обновляем статистику на UI после остановки
+            self.update_stats(self.bot_engine.stats)
+
+            # Принудительно обновляем вкладку статистики, если она открыта
+            if self.tabWidget.currentIndex() == 1:
+                self.refresh_statistics()
+
     def clear_log(self):
         """Clear the log text."""
         self.log_text.clear()
@@ -1158,21 +1189,26 @@ class MainWindow(QMainWindow):
         if not hasattr(self.bot_engine, 'stats_manager') or self.bot_engine.stats_manager is None:
             return
 
-        # Проверяем, запущен ли бот
-        if not self.bot_engine.running.is_set():
-            return
+        # Обновляем только если мы на вкладке статистики
+        if self.tabWidget.currentIndex() == 1:
+            # Если бот запущен, проверяем изменение статистики
+            if self.bot_engine.running.is_set():
+                current_stats = self.bot_engine.stats
+                current_hash = hash(frozenset(current_stats.items()))
 
-        # Проверяем, изменилась ли статистика
-        current_stats = self.bot_engine.stats
-        current_hash = hash(frozenset(current_stats.items()))
-
-        if str(current_hash) != self.last_stats_hash:
-            self.last_stats_hash = str(current_hash)
-
-            # Обновляем статистику только если мы на вкладке статистики
-            if self.tabWidget.currentIndex() == 1:  # Индекс 1 соответствует вкладке статистики
-                self.refresh_statistics()
-                self._py_logger.debug("Автоматическое обновление статистики выполнено")
+                if str(current_hash) != self.last_stats_hash:
+                    self.last_stats_hash = str(current_hash)
+                    self.refresh_statistics()
+                    self._py_logger.debug("Автоматическое обновление статистики выполнено (бот запущен)")
+            else:
+                # Если бот не запущен, обновляем реже
+                import time
+                current_time = time.time()
+                if not hasattr(self, '_last_stats_update') or (
+                        current_time - getattr(self, '_last_stats_update', 0)) > 15:
+                    self._last_stats_update = current_time
+                    self.refresh_statistics()
+                    self._py_logger.debug("Автоматическое обновление статистики выполнено (бот остановлен)")
 
     def update_license_status(self):
         """Update the license status in the status bar."""
@@ -1196,8 +1232,14 @@ class MainWindow(QMainWindow):
 
             if reply == QMessageBox.StandardButton.Yes:
                 self.bot_engine.stop()
+                # Гарантируем сохранение статистики
+                if hasattr(self.bot_engine, 'stats_manager') and self.bot_engine.stats_manager is not None:
+                    self.bot_engine.stats_manager.save_stats()
                 event.accept()
             else:
                 event.ignore()
         else:
+            # Сохраняем статистику даже если бот не запущен
+            if hasattr(self.bot_engine, 'stats_manager') and self.bot_engine.stats_manager is not None:
+                self.bot_engine.stats_manager.save_stats()
             event.accept()
