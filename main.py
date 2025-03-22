@@ -55,7 +55,7 @@ def init_bot_engine():
     template_dir = resource_path("resources/images")
 
     # Debug information
-    logging.info(f"ADB Path: {adb_path}")
+    logging.info(f"Путь к ADB: {adb_path}")
     logging.info(f"Шаблоны изображений: {template_dir}")
     logging.info(f"Существует ли папка с шаблонами? {os.path.exists(template_dir)}")
 
@@ -80,7 +80,7 @@ def setup_exception_handler(logger):
             sys.__excepthook__(exc_type, exc_value, exc_traceback)
             return
 
-        logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+        logger.error("Необработанное исключение", exc_info=(exc_type, exc_value, exc_traceback))
 
     sys.excepthook = handle_exception
 
@@ -93,12 +93,12 @@ def main():
 
     # Log application start
     logger.info("=" * 40)
-    logger.info("Starting Age of Magic Bot v2.0")
+    logger.info("Запуск Age of Magic Бот v2.0")
     logger.info("=" * 40)
 
     # Create Qt application
     app = QApplication(sys.argv)
-    app.setApplicationName("Age of Magic Bot")
+    app.setApplicationName("Age of Magic Бот")
     app.setApplicationVersion("2.0")
 
     # Set application icon
@@ -113,7 +113,7 @@ def main():
 
     # Check if license is valid
     if not license_validator.is_license_valid():
-        logger.warning("License not valid or missing. Showing activation dialog.")
+        logger.warning("Лицензия недействительна или отсутствует. Показываем диалог активации.")
         # Create a temporary parent window to own the dialog
         temp_window = QApplication.activeWindow()
 
@@ -123,7 +123,7 @@ def main():
 
         # Check if license is now valid
         if not license_validator.is_license_valid():
-            logger.error("License validation failed. Exiting.")
+            logger.error("Ошибка проверки лицензии. Выход.")
             return 1
 
     # Initialize bot engine

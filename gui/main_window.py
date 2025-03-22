@@ -55,7 +55,7 @@ class MainWindow(QMainWindow):
 
     def init_ui(self):
         """Initialize the UI components."""
-        self.setWindowTitle("Age of Magic Bot v2.0")
+        self.setWindowTitle("Age of Magic Бот v2.0")
         self.setMinimumSize(800, 600)
 
         # Central widget
@@ -66,11 +66,11 @@ class MainWindow(QMainWindow):
         main_layout = UIFactory.create_vertical_layout()
 
         # Title
-        title_label = UIFactory.create_title_label("Age of Magic Bot")
+        title_label = UIFactory.create_title_label("Age of Magic Бот")
         main_layout.addWidget(title_label)
 
         # Status label
-        self.status_label = UIFactory.create_subtitle_label("Status: Idle")
+        self.status_label = UIFactory.create_subtitle_label("Статус: Ожидание")
         main_layout.addWidget(self.status_label)
 
         # Tab widget
@@ -78,19 +78,19 @@ class MainWindow(QMainWindow):
 
         # Main tab
         main_tab = QWidget()
-        tab_widget.addTab(main_tab, "Control")
+        tab_widget.addTab(main_tab, "Управление")
 
         # Stats tab
         stats_tab = QWidget()
-        tab_widget.addTab(stats_tab, "Statistics")
+        tab_widget.addTab(stats_tab, "Статистика")
 
         # Settings tab
         settings_tab = QWidget()
-        tab_widget.addTab(settings_tab, "Settings")
+        tab_widget.addTab(settings_tab, "Настройки")
 
         # License tab
         license_tab = QWidget()
-        tab_widget.addTab(license_tab, "License")
+        tab_widget.addTab(license_tab, "Лицензия")
 
         # Add tabs to main layout
         main_layout.addWidget(tab_widget)
@@ -106,7 +106,7 @@ class MainWindow(QMainWindow):
 
         # Status bar setup
         self.setStatusBar(QStatusBar())
-        self.statusBar().showMessage("Ready")
+        self.statusBar().showMessage("Готово")
 
         # Update license info in status bar
         self.update_license_status()
@@ -120,23 +120,23 @@ class MainWindow(QMainWindow):
 
         # Start button
         self.start_button = UIFactory.create_success_button(
-            "▶ Start Bot",
-            tooltip="Start the bot"
+            "▶ Запустить бота",
+            tooltip="Запустить бота"
         )
         self.start_button.clicked.connect(self.start_bot)
         controls_layout.addWidget(self.start_button)
 
         # Stop button
         self.stop_button = UIFactory.create_danger_button(
-            "⛔ Stop Bot",
-            tooltip="Stop the bot"
+            "⛔ Остановить бота",
+            tooltip="Остановить бота"
         )
         self.stop_button.clicked.connect(self.stop_bot)
         self.stop_button.setEnabled(False)
         controls_layout.addWidget(self.stop_button)
 
         # Add controls to layout
-        controls_group = UIFactory.create_group_box("Controls")
+        controls_group = UIFactory.create_group_box("Управление")
         controls_group.setLayout(controls_layout)
         layout.addWidget(controls_group)
 
@@ -144,47 +144,47 @@ class MainWindow(QMainWindow):
         stats_layout = UIFactory.create_grid_layout()
 
         # Runtime
-        stats_layout.addWidget(UIFactory.create_label("Runtime:"), 0, 0)
+        stats_layout.addWidget(UIFactory.create_label("Время работы:"), 0, 0)
         self.runtime_label = UIFactory.create_label("00:00:00")
         stats_layout.addWidget(self.runtime_label, 0, 1)
 
         # Battles started
-        stats_layout.addWidget(UIFactory.create_label("Battles Started:"), 1, 0)
+        stats_layout.addWidget(UIFactory.create_label("Боёв начато:"), 1, 0)
         self.battles_label = UIFactory.create_label("0")
         stats_layout.addWidget(self.battles_label, 1, 1)
 
         # Victories
-        stats_layout.addWidget(UIFactory.create_label("Victories:"), 2, 0)
+        stats_layout.addWidget(UIFactory.create_label("Победы:"), 2, 0)
         self.victories_label = UIFactory.create_label("0")
         stats_layout.addWidget(self.victories_label, 2, 1)
 
         # Defeats
-        stats_layout.addWidget(UIFactory.create_label("Defeats:"), 3, 0)
+        stats_layout.addWidget(UIFactory.create_label("Поражения:"), 3, 0)
         self.defeats_label = UIFactory.create_label("0")
         stats_layout.addWidget(self.defeats_label, 3, 1)
 
         # Connection losses
-        stats_layout.addWidget(UIFactory.create_label("Connection Losses:"), 0, 2)
+        stats_layout.addWidget(UIFactory.create_label("Потери соединения:"), 0, 2)
         self.conn_losses_label = UIFactory.create_label("0")
         stats_layout.addWidget(self.conn_losses_label, 0, 3)
 
         # Errors
-        stats_layout.addWidget(UIFactory.create_label("Errors:"), 1, 2)
+        stats_layout.addWidget(UIFactory.create_label("Ошибки:"), 1, 2)
         self.errors_label = UIFactory.create_label("0")
         stats_layout.addWidget(self.errors_label, 1, 3)
 
         # Success rate
-        stats_layout.addWidget(UIFactory.create_label("Success Rate:"), 2, 2)
+        stats_layout.addWidget(UIFactory.create_label("Успешность:"), 2, 2)
         self.success_rate_label = UIFactory.create_label("0%")
         stats_layout.addWidget(self.success_rate_label, 2, 3)
 
         # Add stats to layout
-        stats_group = UIFactory.create_group_box("Statistics")
+        stats_group = UIFactory.create_group_box("Статистика")
         stats_group.setLayout(stats_layout)
         layout.addWidget(stats_group)
 
         # Log section
-        log_group = UIFactory.create_group_box("Log")
+        log_group = UIFactory.create_group_box("Журнал")
         log_layout = UIFactory.create_vertical_layout()
 
         # Log text
@@ -192,7 +192,7 @@ class MainWindow(QMainWindow):
         log_layout.addWidget(self.log_text)
 
         # Clear log button
-        clear_log_button = UIFactory.create_primary_button("Clear Log")
+        clear_log_button = UIFactory.create_primary_button("Очистить журнал")
         clear_log_button.clicked.connect(self.clear_log)
         log_layout.addWidget(clear_log_button)
 
@@ -207,7 +207,7 @@ class MainWindow(QMainWindow):
 
         # Placeholder for future stats visualizations
         placeholder = UIFactory.create_label(
-            "Detailed statistics will be shown here in future updates.",
+            "Подробная статистика будет доступна в будущих обновлениях.",
             alignment=Qt.AlignmentFlag.AlignCenter
         )
         layout.addWidget(placeholder)
@@ -273,38 +273,38 @@ class MainWindow(QMainWindow):
         layout = UIFactory.create_vertical_layout()
 
         # License info
-        info_group = UIFactory.create_group_box("License Information")
+        info_group = UIFactory.create_group_box("Информация о лицензии")
         info_layout = UIFactory.create_grid_layout()
 
         # Status
-        info_layout.addWidget(UIFactory.create_label("Status:"), 0, 0)
-        self.license_status_label = UIFactory.create_label("Checking...")
+        info_layout.addWidget(UIFactory.create_label("Статус:"), 0, 0)
+        self.license_status_label = UIFactory.create_label("Проверка...")
         info_layout.addWidget(self.license_status_label, 0, 1)
 
         # Expiration
-        info_layout.addWidget(UIFactory.create_label("Expiration Date:"), 1, 0)
-        self.license_expiration_label = UIFactory.create_label("Unknown")
+        info_layout.addWidget(UIFactory.create_label("Срок действия до:"), 1, 0)
+        self.license_expiration_label = UIFactory.create_label("Неизвестно")
         info_layout.addWidget(self.license_expiration_label, 1, 1)
 
         # Days left
-        info_layout.addWidget(UIFactory.create_label("Days Remaining:"), 2, 0)
-        self.license_days_left_label = UIFactory.create_label("Unknown")
+        info_layout.addWidget(UIFactory.create_label("Осталось дней:"), 2, 0)
+        self.license_days_left_label = UIFactory.create_label("Неизвестно")
         info_layout.addWidget(self.license_days_left_label, 2, 1)
 
         info_group.setLayout(info_layout)
         layout.addWidget(info_group)
 
         # Activation
-        activation_group = UIFactory.create_group_box("License Activation")
+        activation_group = UIFactory.create_group_box("Активация лицензии")
         activation_layout = UIFactory.create_vertical_layout()
 
         # Activate button
-        activate_button = UIFactory.create_primary_button("Activate License")
+        activate_button = UIFactory.create_primary_button("Активировать лицензию")
         activate_button.clicked.connect(self.show_activation_dialog)
         activation_layout.addWidget(activate_button)
 
         # View fingerprint button
-        fingerprint_button = UIFactory.create_primary_button("View Machine Fingerprint")
+        fingerprint_button = UIFactory.create_primary_button("Показать отпечаток устройства")
         fingerprint_button.clicked.connect(self.show_fingerprint)
         activation_layout.addWidget(fingerprint_button)
 
@@ -325,7 +325,7 @@ class MainWindow(QMainWindow):
             self.start_button.setEnabled(False)
             self.stop_button.setEnabled(True)
             self.start_time = time.time()
-            self.statusBar().showMessage("Bot running")
+            self.statusBar().showMessage("Бот запущен")
             self.update_runtime()
 
     def stop_bot(self):
@@ -334,7 +334,7 @@ class MainWindow(QMainWindow):
             self.start_button.setEnabled(True)
             self.stop_button.setEnabled(False)
             self.start_time = None
-            self.statusBar().showMessage("Bot stopped")
+            self.statusBar().showMessage("Бот остановлен")
 
     def clear_log(self):
         """Clear the log text."""
@@ -359,7 +359,20 @@ class MainWindow(QMainWindow):
 
     def update_bot_state(self, state):
         """Update the UI to reflect the current bot state."""
-        self.status_label.setText(f"Status: {state}")
+        state_translations = {
+            "IDLE": "Ожидание",
+            "STARTING": "Запуск",
+            "SELECTING_BATTLE": "Выбор боя",
+            "CONFIRMING_BATTLE": "Подтверждение боя",
+            "IN_BATTLE": "В бою",
+            "BATTLE_ENDED": "Бой завершен",
+            "CONNECTION_LOST": "Соединение потеряно",
+            "RECONNECTING": "Переподключение",
+            "ERROR": "Ошибка"
+        }
+
+        translated_state = state_translations.get(state, state)
+        self.status_label.setText(f"Статус: {translated_state}")
 
         # Different colors based on state
         if state == "IDLE":
@@ -440,7 +453,16 @@ class MainWindow(QMainWindow):
 
         # Update status
         status = license_info.get("status", "unknown")
-        self.license_status_label.setText(status.capitalize())
+        status_translations = {
+            "valid": "Действительна",
+            "expired": "Истекла",
+            "missing": "Отсутствует",
+            "invalid": "Недействительна",
+            "error": "Ошибка",
+            "unknown": "Неизвестно"
+        }
+
+        self.license_status_label.setText(status_translations.get(status, status.capitalize()))
 
         # Set color based on status
         if status == "valid":
@@ -453,9 +475,9 @@ class MainWindow(QMainWindow):
         # Update expiration
         expiration = license_info.get("expiration")
         if expiration:
-            self.license_expiration_label.setText(expiration.strftime("%Y-%m-%d"))
+            self.license_expiration_label.setText(expiration.strftime("%d.%m.%Y"))
         else:
-            self.license_expiration_label.setText("N/A")
+            self.license_expiration_label.setText("Н/Д")
 
         # Update days left
         days_left = license_info.get("days_left", 0)
@@ -469,17 +491,17 @@ class MainWindow(QMainWindow):
         if self.license_validator.is_license_valid():
             license_info = self.license_validator.get_license_info()
             days_left = license_info.get("days_left", 0)
-            self.statusBar().showMessage(f"License: Valid ({days_left} days remaining)")
+            self.statusBar().showMessage(f"Лицензия: Действительна (осталось {days_left} дней)")
         else:
-            self.statusBar().showMessage("License: Invalid or expired")
+            self.statusBar().showMessage("Лицензия: Недействительна или истекла")
 
     def closeEvent(self, event):
         """Handle the window close event."""
         if self.bot_engine.running.is_set():
             reply = QMessageBox.question(
                 self,
-                "Exit Confirmation",
-                "The bot is still running. Are you sure you want to exit?",
+                "Подтверждение выхода",
+                "Бот всё ещё работает. Вы уверены, что хотите выйти?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No
             )

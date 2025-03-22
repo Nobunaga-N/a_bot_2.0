@@ -72,14 +72,14 @@ class AdbController:
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                 check=True, timeout=5, creationflags=self.creation_flags
             )
-            self.logger.info(f"Tap sent to coordinates ({x}, {y})")
+            self.logger.info(f"Нажатие отправлено на координаты ({x}, {y})")
             return True
         except subprocess.TimeoutExpired:
-            self.logger.error("🚨 ADB tap timeout: Command did not complete in time")
+            self.logger.error("🚨 Таймаут ADB нажатия: Команда не завершилась вовремя")
         except subprocess.CalledProcessError as e:
-            self.logger.error(f"🚨 ADB tap error: {e}")
+            self.logger.error(f"🚨 Ошибка ADB нажатия: {e}")
         except Exception as e:
-            self.logger.error(f"🚨 Unexpected error during tap: {e}")
+            self.logger.error(f"🚨 Непредвиденная ошибка при нажатии: {e}")
         return False
 
     def capture_screen(self) -> Optional[bytes]:
@@ -126,6 +126,7 @@ class AdbController:
                 self.logger.error(f"🚨 Ошибка при захвате экрана (попытка {attempt + 1}): {e}")
 
             # Небольшая задержка перед следующей попыткой
+            import time
             time.sleep(1)
 
         self.logger.error("🚨 Ошибка: Не удалось загрузить изображение из ADB после нескольких попыток.")

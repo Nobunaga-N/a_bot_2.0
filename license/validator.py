@@ -30,7 +30,7 @@ class LicenseValidator:
         last_run_time = self.storage.get_last_run_time()
 
         if last_run_time is not None and now_utc < last_run_time:
-            self.logger.warning("System time has been rolled back! Blocking operation.")
+            self.logger.warning("Системное время было отмотано назад! Блокировка операции.")
             return False
 
         return True
@@ -54,7 +54,7 @@ class LicenseValidator:
             decoded = base64.b64decode(compact_key).decode()
             parts = decoded.split("|", 1)
             if len(parts) != 2:
-                self.logger.error("Invalid license format")
+                self.logger.error("Неверный формат лицензии")
                 return False
 
             exp_str, sig_b64 = parts[0], parts[1]
@@ -63,7 +63,7 @@ class LicenseValidator:
             now_utc = datetime.datetime.utcnow()
             exp_date = datetime.datetime.fromisoformat(exp_str)
             if now_utc > exp_date:
-                self.logger.warning("License has expired")
+                self.logger.warning("Срок действия лицензии истек")
                 return False
 
             # Verify signature
@@ -86,7 +86,7 @@ class LicenseValidator:
 
             return True
         except Exception as e:
-            self.logger.error(f"License verification error: {e}")
+            self.logger.error(f"Ошибка проверки лицензии: {e}")
             return False
 
     def is_license_valid(self):
@@ -153,7 +153,7 @@ class LicenseValidator:
                     "days_left": days_left
                 }
         except Exception as e:
-            self.logger.error(f"Error getting license info: {e}")
+            self.logger.error(f"Ошибка получения информации о лицензии: {e}")
             return {
                 "status": "error",
                 "expiration": None,

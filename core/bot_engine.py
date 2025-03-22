@@ -79,15 +79,15 @@ class BotEngine:
         """Starts the bot in a separate thread."""
         if not self.running.is_set():
             if not self.adb.check_connection():
-                self.logger.error("🚨 ADB not connected. Check emulator settings!")
+                self.logger.error("🚨 ADB не подключен. Проверьте настройки эмулятора!")
                 if self.signals:
-                    self.signals.error.emit("ADB not connected. Check emulator settings!")
+                    self.signals.error.emit("ADB не подключен. Проверьте настройки эмулятора!")
                 return False
 
             self.running.set()
             self.state = BotState.STARTING
             threading.Thread(target=self._bot_loop, daemon=True).start()
-            self.logger.info("▶ Bot started")
+            self.logger.info("▶ Бот запущен")
             return True
         return False
 
@@ -96,7 +96,7 @@ class BotEngine:
         if self.running.is_set():
             self.running.clear()
             self.state = BotState.IDLE
-            self.logger.info("⛔ Bot stopped")
+            self.logger.info("⛔ Бот остановлен")
             return True
         return False
 
@@ -195,14 +195,14 @@ class BotEngine:
 
     def _handle_selecting_battle(self):
         """Handler for SELECTING_BATTLE state."""
-        self.logger.info("Selecting battle...")
+        self.logger.info("Выбор боя...")
         self.adb.tap(*self.click_coords["start_battle"])
         time.sleep(2)
         return BotState.CONFIRMING_BATTLE
 
     def _handle_confirming_battle(self):
         """Handler for CONFIRMING_BATTLE state."""
-        self.logger.info("Confirming battle...")
+        self.logger.info("Подтверждение боя...")
         self.adb.tap(*self.click_coords["confirm_battle"])
         self.stats["battles_started"] += 1
 
@@ -214,7 +214,7 @@ class BotEngine:
         if match_loc:
             return BotState.IN_BATTLE
         else:
-            self.logger.error("🚨 Auto battle button not found!")
+            self.logger.error("🚨 Кнопка автобоя не найдена!")
 
             # Check for connection issues
             screen_data = self.capture_screen()
@@ -225,7 +225,7 @@ class BotEngine:
 
     def _handle_in_battle(self):
         """Handler for IN_BATTLE state."""
-        self.logger.info("In battle, enabling auto battle...")
+        self.logger.info("В бою, включаем автобой...")
         self.adb.tap(*self.click_coords["auto_battle"])
 
         # Wait for battle to end (victory or defeat)
@@ -242,7 +242,7 @@ class BotEngine:
                 return BotState.CONNECTION_LOST
 
             # Battle seems to be stuck, try emergency clicks
-            self.logger.warning("⚠ Battle seems stuck! Performing emergency clicks.")
+            self.logger.warning("⚠ Бой, похоже, застрял! Выполняем экстренные нажатия.")
             self._perform_emergency_clicks()
             return BotState.STARTING
 
@@ -254,14 +254,14 @@ class BotEngine:
             return BotState.ERROR
 
         if self.image_matcher.find_in_screen(screen_data, "victory.png"):
-            self.logger.info("🏆 Victory! Continuing to next battle.")
+            self.logger.info("🏆 Победа! Переходим к следующему бою.")
             self.stats["victories"] += 1
             self.adb.tap(*self.click_coords["exit_after_win"])
             time.sleep(5)
             return BotState.STARTING
 
         elif self.image_matcher.find_in_screen(screen_data, "defeat.png"):
-            self.logger.info("❌ Defeat! Refreshing opponents and trying again.")
+            self.logger.info("❌ Поражение! Обновляем список соперников и пробуем снова.")
             self.stats["defeats"] += 1
             self.adb.tap(*self.click_coords["exit_after_win"])
             time.sleep(10)
@@ -274,7 +274,7 @@ class BotEngine:
 
     def _handle_connection_lost(self):
         """Handler for CONNECTION_LOST state."""
-        self.logger.warning("⚠ Connection to server lost! Attempting to reconnect...")
+        self.logger.warning("⚠ Соединение с сервером потеряно! Пытаемся переподключиться...")
         self.stats["connection_losses"] += 1
 
         # Wait for the "Связаться с нами" button to appear
@@ -299,12 +299,12 @@ class BotEngine:
             time.sleep(7)
             return BotState.RECONNECTING
         else:
-            self.logger.error("🚨 Unable to find reconnect button!")
+            self.logger.error("🚨 Не удалось найти кнопку переподключения!")
             return BotState.ERROR
 
     def _handle_reconnecting(self):
         """Handler for RECONNECTING state - implements the recovery algorithm."""
-        self.logger.info("Reconnecting to game...")
+        self.logger.info("Переподключение к игре...")
 
         # Try to find cheak.png or confirm_battle.png first (5 seconds)
         result, _ = self.image_matcher.wait_for_images(
@@ -342,12 +342,12 @@ class BotEngine:
             return BotState.IN_BATTLE
 
         # If we still can't find any known screens, return to starting state
-        self.logger.warning("⚠ Could not determine game state after reconnect. Restarting...")
+        self.logger.warning("⚠ Не удалось определить состояние игры после переподключения. Перезапуск...")
         return BotState.STARTING
 
     def _handle_error(self):
         """Handler for ERROR state."""
-        self.logger.error("🚨 Bot encountered an error. Attempting to recover...")
+        self.logger.error("🚨 Бот столкнулся с ошибкой. Пытаемся восстановиться...")
         time.sleep(5)
         return BotState.STARTING
 
@@ -360,19 +360,19 @@ class BotEngine:
         """
         # Check for "Ожидание ответа от сервера" message
         if self.image_matcher.find_in_screen(screen_data, "waiting_for_server.png"):
-            self.logger.warning("⚠ 'Waiting for server response' message detected")
+            self.logger.warning("⚠ Обнаружено сообщение 'Ожидание ответа от сервера'")
             return True
 
         # Check for "Связаться с нами" button
         if self.image_matcher.find_in_screen(screen_data, "contact_us.png"):
-            self.logger.warning("⚠ 'Contact us' button detected")
+            self.logger.warning("⚠ Обнаружена кнопка 'Связаться с нами'")
             return True
 
         return False
 
     def _perform_emergency_clicks(self):
         """Performs emergency clicks to try to recover from a stuck state."""
-        self.logger.warning("⚠ Performing emergency clicks...")
+        self.logger.warning("⚠ Выполнение экстренных нажатий...")
 
         # Click back button
         self.adb.tap(49, 50)

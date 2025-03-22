@@ -47,9 +47,9 @@ class ImageMatcher:
         return template
 
     def find_in_screen(self,
-                       screen_data: bytes,
-                       template_name: str,
-                       threshold: float = 0.8) -> Optional[Tuple[int, int]]:
+                   screen_data: bytes,
+                   template_name: str,
+                   threshold: float = 0.8) -> Optional[Tuple[int, int]]:
         """
         Searches for a template in the screen data.
 
@@ -101,10 +101,10 @@ class ImageMatcher:
             return None
 
     def wait_for_images(self,
-                        screen_provider: Callable[[], Optional[bytes]],
-                        image_list: List[str],
-                        timeout: int = 90,
-                        check_interval: float = 3) -> Tuple[Optional[str], Optional[Tuple[int, int]]]:
+                    screen_provider: Callable[[], Optional[bytes]],
+                    image_list: List[str],
+                    timeout: int = 90,
+                    check_interval: float = 3) -> Tuple[Optional[str], Optional[Tuple[int, int]]]:
         """
         Waits for one of the specified images to appear on screen.
 
@@ -117,6 +117,7 @@ class ImageMatcher:
         Returns:
             (image_name, location) of the first matched image or (None, None) if timeout
         """
+        import time
         start_time = time.time()
 
         while time.time() - start_time < timeout:
@@ -128,10 +129,10 @@ class ImageMatcher:
             for image_name in image_list:
                 match_location = self.find_in_screen(screen_data, image_name)
                 if match_location:
-                    self.logger.info(f"🏆 Image found: {image_name}")
+                    self.logger.info(f"🏆 Изображение найдено: {image_name}")
                     return image_name, match_location
 
             time.sleep(check_interval)
 
-        self.logger.warning("⚠ Timeout waiting for images")
+        self.logger.warning("⚠ Таймаут ожидания изображений")
         return None, None

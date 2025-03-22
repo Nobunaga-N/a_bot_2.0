@@ -26,7 +26,7 @@ class LicenseDialog(QDialog):
 
     def init_ui(self):
         """Initialize the UI components."""
-        self.setWindowTitle("License Activation")
+        self.setWindowTitle("Активация лицензии")
         self.setMinimumWidth(500)
         self.setMinimumHeight(250)
 
@@ -34,12 +34,12 @@ class LicenseDialog(QDialog):
         main_layout = UIFactory.create_vertical_layout()
 
         # Title
-        title_label = UIFactory.create_title_label("Age of Magic Bot - License Activation")
+        title_label = UIFactory.create_title_label("Age of Magic Бот - Активация лицензии")
         main_layout.addWidget(title_label)
 
         # Instructions
         instructions = UIFactory.create_label(
-            "Please enter your license key (compact base64):",
+            "Пожалуйста, введите ваш лицензионный ключ (компактный base64):",
             alignment=Qt.AlignmentFlag.AlignCenter
         )
         instructions.setFont(QFont(UIFactory.create_label("").font().family(), 12))
@@ -47,7 +47,7 @@ class LicenseDialog(QDialog):
 
         # License key input
         self.license_key_input = UIFactory.create_line_edit(
-            placeholder="Enter your license key here..."
+            placeholder="Введите ваш лицензионный ключ здесь..."
         )
         main_layout.addWidget(self.license_key_input)
 
@@ -55,14 +55,14 @@ class LicenseDialog(QDialog):
         button_layout = UIFactory.create_horizontal_layout()
 
         self.activate_button = UIFactory.create_success_button(
-            "Activate License",
-            tooltip="Validate and activate the license key"
+            "Активировать лицензию",
+            tooltip="Проверить и активировать лицензионный ключ"
         )
         self.activate_button.clicked.connect(self.activate_license)
 
         self.fingerprint_button = UIFactory.create_primary_button(
-            "Show Machine Fingerprint",
-            tooltip="Display your unique machine fingerprint for license generation"
+            "Показать отпечаток устройства",
+            tooltip="Показать уникальный отпечаток вашего устройства для генерации лицензии"
         )
         self.fingerprint_button.clicked.connect(self.show_fingerprint)
 
@@ -83,8 +83,8 @@ class LicenseDialog(QDialog):
         if not license_key:
             QMessageBox.warning(
                 self,
-                "Empty License Key",
-                "Please enter a valid license key."
+                "Пустой лицензионный ключ",
+                "Пожалуйста, введите действительный лицензионный ключ."
             )
             return
 
@@ -96,8 +96,8 @@ class LicenseDialog(QDialog):
 
             QMessageBox.information(
                 self,
-                "License Activated",
-                "Your license has been successfully activated!"
+                "Лицензия активирована",
+                "Ваша лицензия была успешно активирована!"
             )
 
             # Emit the activation_successful signal
@@ -108,9 +108,9 @@ class LicenseDialog(QDialog):
         else:
             QMessageBox.critical(
                 self,
-                "License Error",
-                "The license key is invalid or has expired.\n"
-                "Please check the key and try again."
+                "Ошибка лицензии",
+                "Лицензионный ключ недействителен или истек.\n"
+                "Пожалуйста, проверьте ключ и попробуйте снова."
             )
 
     def show_fingerprint(self):
@@ -121,14 +121,14 @@ class LicenseDialog(QDialog):
         if not fingerprint:
             QMessageBox.critical(
                 self,
-                "Error",
-                "Failed to generate machine fingerprint."
+                "Ошибка",
+                "Не удалось сгенерировать отпечаток устройства."
             )
             return
 
         # Create dialog
         fingerprint_dialog = QDialog(self)
-        fingerprint_dialog.setWindowTitle("Machine Fingerprint")
+        fingerprint_dialog.setWindowTitle("Отпечаток устройства")
         fingerprint_dialog.setMinimumWidth(450)
 
         # Layout
@@ -136,7 +136,7 @@ class LicenseDialog(QDialog):
 
         # Instructions
         instructions = UIFactory.create_label(
-            "Copy this fingerprint and send it to the developer to get a license key:",
+            "Скопируйте этот отпечаток и отправьте его разработчику для получения лицензионного ключа:",
             alignment=Qt.AlignmentFlag.AlignCenter
         )
         layout.addWidget(instructions)
@@ -148,7 +148,7 @@ class LicenseDialog(QDialog):
         layout.addWidget(fingerprint_text)
 
         # Copy button
-        copy_button = UIFactory.create_primary_button("Copy to Clipboard")
+        copy_button = UIFactory.create_primary_button("Копировать в буфер обмена")
         copy_button.clicked.connect(
             lambda: self._copy_to_clipboard(fingerprint, copy_button)
         )
@@ -165,7 +165,7 @@ class LicenseDialog(QDialog):
 
         # Change button text
         original_text = button.text()
-        button.setText("Copied!")
+        button.setText("Скопировано!")
 
         # Reset button text after a delay
         from PyQt6.QtCore import QTimer
