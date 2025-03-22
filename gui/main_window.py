@@ -1,6 +1,5 @@
 import os
 import time
-from datetime import datetime
 import datetime
 import logging
 
@@ -985,7 +984,8 @@ class MainWindow(QMainWindow):
 
     def append_log(self, level, message):
         """Append a message to the log text."""
-        timestamp = datetime.now().strftime("%H:%M:%S")
+        # Исправленная строка - используем datetime.datetime.now() вместо datetime.now()
+        timestamp = datetime.datetime.now().strftime("%H:%M:%S")
 
         # Get color for the log level
         log_colors = Styles.get_log_colors()
