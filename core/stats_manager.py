@@ -98,17 +98,31 @@ class StatsManager:
             total_stats = self.get_total_stats()
 
             # Add current session to history if there are any battles
-            if self.current_stats["battles_started"] > 0:
+            if sum(self.current_stats.values()) > 0:
                 session_end = datetime.datetime.now()
 
-                session_record = {
-                    "start_time": self.session_start.isoformat(),
-                    "end_time": session_end.isoformat(),
-                    "duration_seconds": (session_end - self.session_start).total_seconds(),
-                    "stats": self.current_stats.copy()
-                }
+                # Проверка, чтобы не добавлять пустые сессии или дублирующиеся записи
+                is_new_session = True
 
-                self.history.append(session_record)
+                # Проверяем, существует ли уже запись с тем же временем начала
+                for record in self.history:
+                    if record.get("start_time") == self.session_start.isoformat():
+                        # Обновляем существующую запись
+                        record["end_time"] = session_end.isoformat()
+                        record["duration_seconds"] = (session_end - self.session_start).total_seconds()
+                        record["stats"] = self.current_stats.copy()
+                        is_new_session = False
+                        break
+
+                if is_new_session and any(val > 0 for val in self.current_stats.values()):
+                    session_record = {
+                        "start_time": self.session_start.isoformat(),
+                        "end_time": session_end.isoformat(),
+                        "duration_seconds": (session_end - self.session_start).total_seconds(),
+                        "stats": self.current_stats.copy()
+                    }
+
+                    self.history.append(session_record)
 
             # Prepare data for saving
             data = {
@@ -125,6 +139,8 @@ class StatsManager:
             return True
         except Exception as e:
             self.logger.error(f"Ошибка при сохранении статистики: {e}")
+            import traceback
+            self.logger.error(traceback.format_exc())
             return False
 
     def update_stats(self, stats: Dict[str, int]) -> None:
