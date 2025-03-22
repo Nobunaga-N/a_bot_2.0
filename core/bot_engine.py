@@ -3,6 +3,7 @@ import logging
 import threading
 from enum import Enum, auto
 from typing import Dict, Tuple, Optional, List, Callable
+from core.stats_manager import StatsManager
 
 
 class BotState(Enum):
@@ -65,6 +66,9 @@ class BotEngine:
             "keys_collected": 0  # New statistic for tracking keys
         }
 
+        # Инициализация stats_manager
+        self.stats_manager = None  # Будет установлен позже в main.py
+
         # Signals for communicating with the UI (will be set in the main application)
         self.signals = None
 
@@ -98,6 +102,11 @@ class BotEngine:
             self.running.clear()
             self.state = BotState.IDLE
             self.logger.info("⛔ Бот остановлен")
+
+            # Save stats when stopping the bot
+            if self.stats_manager:
+                self.stats_manager.save_stats()
+
             return True
         return False
 
@@ -302,6 +311,11 @@ class BotEngine:
             # Continue with normal flow - exit after win
             self.adb.tap(*self.click_coords["exit_after_win"])
             time.sleep(5)
+
+            # Update stats manager if available
+            if self.stats_manager:
+                self.stats_manager.update_stats(self.stats)
+
             return BotState.STARTING
 
         elif self.image_matcher.find_in_screen(screen_data, "defeat.png"):
@@ -316,9 +330,18 @@ class BotEngine:
 
             self.adb.tap(*self.click_coords["refresh_opponents"])
             time.sleep(2)
+
+            # Update stats manager if available
+            if self.stats_manager:
+                self.stats_manager.update_stats(self.stats)
+
             return BotState.STARTING
 
         # If we can't find victory or defeat screens
+        # Update stats manager if available
+        if self.stats_manager:
+            self.stats_manager.update_stats(self.stats)
+
         return BotState.STARTING
 
     def _handle_connection_lost(self):

@@ -16,6 +16,7 @@ from license.validator import LicenseValidator
 from gui.main_window import MainWindow
 from gui.license_dialog import LicenseDialog
 from gui.styles import Styles
+from core.stats_manager import StatsManager
 
 
 def init_logging():
@@ -47,6 +48,17 @@ def init_license_system():
 
     return validator
 
+
+def init_stats_manager():
+    """Initialize the statistics manager."""
+    # Get directory
+    stats_dir = config.get("license", "directory")
+
+    # Create statistics manager
+    stats_manager = StatsManager(stats_dir)
+
+    logging.info(f"Инициализация менеджера статистики. Каталог: {stats_dir}")
+    return stats_manager
 
 def init_bot_engine():
     """Initialize the bot engine."""
@@ -133,7 +145,17 @@ def main():
             return 1
 
     # Initialize bot engine
+    # Initialize statistics manager
+    stats_manager = init_stats_manager()
+
+    # Стало:
+    # Initialize bot engine
     bot_engine = init_bot_engine()
+
+    # Initialize and connect stats manager to bot engine
+    stats_manager = init_stats_manager()
+    bot_engine.stats_manager = stats_manager
+    bot_engine.stats = stats_manager.current_stats
 
     # Create main window
     main_window = MainWindow(bot_engine, license_validator)
