@@ -186,7 +186,7 @@ class MainWindow(QMainWindow):
         stats_layout.addWidget(self.success_rate_label, 2, 3)
 
         # Keys per battle (new statistic)
-        stats_layout.addWidget(UIFactory.create_label("Ключей за бой:"), 3, 2)
+        stats_layout.addWidget(UIFactory.create_label("Ключей за бой (средн.):"), 3, 2)
         self.keys_per_battle_label = UIFactory.create_label("0")
         stats_layout.addWidget(self.keys_per_battle_label, 3, 3)
 

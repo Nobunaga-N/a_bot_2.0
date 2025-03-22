@@ -194,7 +194,6 @@ class ImageMatcher:
 
                     # Используем OCR для распознавания числа
                     keys_count = self.ocr_helper.recognize_number(number_region, default_val=12)
-                    self.logger.info(f"🔑 Обнаружено {keys_count} ключей")
                     return keys_count
 
                 # Если извлечение области не удалось, возвращаем значение по умолчанию

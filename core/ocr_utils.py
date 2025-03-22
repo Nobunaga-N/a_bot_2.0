@@ -119,7 +119,6 @@ class OCRHelper:
                 recognized_number = int(numbers[0])
                 # Проверяем, находится ли число в допустимых пределах
                 if min_val <= recognized_number <= max_val:
-                    self.logger.info(f"🔑 OCR распознал число: {recognized_number}")
                     return recognized_number
                 else:
                     self.logger.warning(
