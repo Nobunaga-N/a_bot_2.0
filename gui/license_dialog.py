@@ -160,7 +160,8 @@ class LicenseDialog(QDialog):
     def _copy_to_clipboard(self, text, button):
         """Copy text to clipboard and change button text temporarily."""
         # Copy to clipboard
-        clipboard = self.parent().clipboard() if self.parent() else QClipboard()
+        from PyQt6.QtGui import QGuiApplication
+        clipboard = QGuiApplication.clipboard()
         clipboard.setText(text)
 
         # Change button text
