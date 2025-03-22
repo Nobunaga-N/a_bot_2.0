@@ -223,14 +223,43 @@ class BotEngine:
 
             return BotState.ERROR
 
+    def update_settings(self, battle_timeout=None, max_refresh_attempts=None):
+        """Обновляет настройки бота во время выполнения.
+
+        Args:
+            battle_timeout (int, optional): Время ожидания боя в секундах
+            max_refresh_attempts (int, optional): Максимальное количество попыток обновления
+        """
+        from config import config
+
+        # Обновляем только если значения переданы
+        if battle_timeout is not None:
+            self.logger.info(f"Обновлено время ожидания боя: {battle_timeout} сек")
+
+        if max_refresh_attempts is not None:
+            self.logger.info(f"Обновлено макс. количество попыток обновления: {max_refresh_attempts}")
+
+        # Логируем обновление настроек
+        self.logger.info("Настройки бота обновлены")
+
     def _handle_in_battle(self):
         """Handler for IN_BATTLE state."""
+        from config import config
+
         self.logger.info("В бою, включаем автобой...")
         self.adb.tap(*self.click_coords["auto_battle"])
 
+        # Получаем значения из конфигурации
+        battle_timeout = config.get("bot", "battle_timeout", 120)
+        check_interval = config.get("bot", "check_interval", 3)
+
+        self.logger.info(f"Ожидание окончания боя (таймаут: {battle_timeout} сек)...")
+
         # Wait for battle to end (victory or defeat)
         result, _ = self.image_matcher.wait_for_images(
-            self.capture_screen, ["victory.png", "defeat.png"], timeout=120, check_interval=3
+            self.capture_screen, ["victory.png", "defeat.png"],
+            timeout=battle_timeout,
+            check_interval=check_interval
         )
 
         if result:
@@ -248,6 +277,8 @@ class BotEngine:
 
     def _handle_battle_ended(self):
         """Handler for BATTLE_ENDED state."""
+        from config import config
+
         # Check which result screen we're on
         screen_data = self.capture_screen()
         if not screen_data:
@@ -265,6 +296,11 @@ class BotEngine:
             self.stats["defeats"] += 1
             self.adb.tap(*self.click_coords["exit_after_win"])
             time.sleep(10)
+
+            # Проверяем, не превышено ли максимальное количество попыток обновления
+            max_refresh = config.get("bot", "max_refresh_attempts", 3)
+            self.logger.info(f"Обновление списка соперников (макс. попыток: {max_refresh})...")
+
             self.adb.tap(*self.click_coords["refresh_opponents"])
             time.sleep(2)
             return BotState.STARTING

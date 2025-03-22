@@ -59,6 +59,12 @@ def init_bot_engine():
     logging.info(f"Шаблоны изображений: {template_dir}")
     logging.info(f"Существует ли папка с шаблонами? {os.path.exists(template_dir)}")
 
+    # Logging configuration values
+    logging.info(f"Загружена конфигурация:")
+    logging.info(f"  - Время ожидания боя: {config.get('bot', 'battle_timeout', 120)} сек")
+    logging.info(f"  - Макс. попыток обновления: {config.get('bot', 'max_refresh_attempts', 3)}")
+    logging.info(f"  - Интервал проверки: {config.get('bot', 'check_interval', 3)} сек")
+
     if os.path.exists(template_dir):
         template_files = [f for f in os.listdir(template_dir) if f.endswith(('.png', '.jpg', '.jpeg'))]
         logging.info(f"Найдены шаблоны: {', '.join(template_files)}")

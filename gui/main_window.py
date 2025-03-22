@@ -214,8 +214,43 @@ class MainWindow(QMainWindow):
 
         tab.setLayout(layout)
 
+    def save_settings(self):
+        """Сохранение настроек в конфигурацию."""
+        from config import config
+
+        # Получаем значения из полей интерфейса
+        battle_timeout = self.battle_timeout_input.text()
+        max_refresh = self.max_refresh_input.text()
+
+        # Проверяем и конвертируем значения
+        try:
+            battle_timeout = int(battle_timeout) if battle_timeout else 120
+            max_refresh = int(max_refresh) if max_refresh else 3
+        except ValueError:
+            self.show_error("Пожалуйста, введите числовые значения для настроек.")
+            return
+
+        # Сохраняем в конфигурацию
+        config.set("bot", "battle_timeout", battle_timeout)
+        config.set("bot", "max_refresh_attempts", max_refresh)
+
+        # Сохраняем конфигурационный файл
+        if config.save():
+            QMessageBox.information(
+                self,
+                "Настройки сохранены",
+                "Настройки успешно сохранены."
+            )
+
+            # Обновляем настройки в движке бота
+            self.bot_engine.update_settings(battle_timeout, max_refresh)
+        else:
+            self.show_error("Ошибка при сохранении настроек.")
+
     def setup_settings_tab(self, tab):
         """Настройка вкладки настроек."""
+        from config import config
+
         layout = UIFactory.create_vertical_layout()
 
         # Настройки ADB
@@ -249,15 +284,20 @@ class MainWindow(QMainWindow):
         # Время ожидания
         bot_layout.addWidget(UIFactory.create_label("Время ожидания боя (сек):"), 0, 0)
         self.battle_timeout_input = UIFactory.create_line_edit(placeholder="120")
+        # Инициализируем текущим значением из конфигурации
+        self.battle_timeout_input.setText(str(config.get("bot", "battle_timeout", 120)))
         bot_layout.addWidget(self.battle_timeout_input, 0, 1)
 
         # Попытки обновления
         bot_layout.addWidget(UIFactory.create_label("Макс. попыток обновления:"), 1, 0)
         self.max_refresh_input = UIFactory.create_line_edit(placeholder="3")
+        # Инициализируем текущим значением из конфигурации
+        self.max_refresh_input.setText(str(config.get("bot", "max_refresh_attempts", 3)))
         bot_layout.addWidget(self.max_refresh_input, 1, 1)
 
         # Кнопка сохранения настроек
         save_button = UIFactory.create_success_button("Сохранить настройки")
+        save_button.clicked.connect(self.save_settings)  # Подключаем обработчик события
         bot_layout.addWidget(save_button, 2, 1)
 
         bot_group.setLayout(bot_layout)
